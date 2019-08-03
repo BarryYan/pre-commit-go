@@ -26,12 +26,15 @@ func main() {
 	files := GetGitStatusFiles()
 	if len(files) != 0 {
 		fmt.Println(White("pre-commit: "), Red("check fail \n"))
+
+		for _, file := range files {
+			logs := GetLog(file)
+			PrintLog(logs)
+		}
+	} else {
+		fmt.Println(White("pre-commit: "), White("check success :) \n"))
 	}
 
-	for _, file := range files {
-		logs := GetLog(file)
-		PrintLog(logs)
-	}
 }
 
 // GetGitStatusFiles from git status comand
