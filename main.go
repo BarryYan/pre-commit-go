@@ -21,7 +21,13 @@ type Log struct {
 }
 
 func main() {
+	fmt.Println(White("pre-commit: "), Blue("checking..."))
+
 	files := GetGitStatusFiles()
+	if len(files) != 0 {
+		fmt.Println(White("pre-commit: "), Red("check fail \n"))
+	}
+
 	for _, file := range files {
 		logs := GetLog(file)
 		PrintLog(logs)
