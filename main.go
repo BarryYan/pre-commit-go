@@ -24,15 +24,16 @@ func main() {
 	fmt.Println(White("pre-commit: "), Blue("checking..."))
 
 	files := GetGitStatusFiles()
-	if len(files) != 0 {
-		fmt.Println(White("pre-commit: "), Red("check fail \n"))
+	var logs []Log
+	for _, file := range files {
+		logs = append(logs, GetLog(file)...)
+	}
 
-		for _, file := range files {
-			logs := GetLog(file)
-			PrintLog(logs)
-		}
+	if len(logs) == 0 {
+		fmt.Println(White("pre-commit: "), Blue("check success :) \n"))
 	} else {
-		fmt.Println(White("pre-commit: "), White("check success :) \n"))
+		fmt.Println(White("pre-commit: "), Red("check fail \n"))
+		PrintLog(logs)
 	}
 
 }
@@ -86,11 +87,20 @@ func GetLog(filePath string) []Log {
 		lines := strings.Split(content, "\n")
 		for i := 0; i < len(lines); i++ {
 			if strings.Contains(lines[i], CONFLICT_SIGNAL) {
+				var conflict []string
+				if i-1 >= 0 {
+					conflict = append(conflict, lines[i-1])
+				}
+				conflict = append(conflict, Red(lines[i]))
+				if i+1 < len(lines) {
+					conflict = append(conflict, lines[i+1])
+				}
+
 				logs = append(logs, Log{
 					Filename: filePath,
-					Row:      i,
-					Col:      strings.Index(lines[i], CONFLICT_SIGNAL),
-					Conflict: []string{lines[i-1], lines[i], lines[i+1]},
+					Row:      i + 1,
+					Col:      strings.Index(lines[i], CONFLICT_SIGNAL) + 1,
+					Conflict: conflict,
 				})
 			}
 		}
@@ -107,10 +117,11 @@ func PrintLog(logs []Log) {
 		fmt.Println(Grey("      Line: ") + Blue(strconv.Itoa(logs[i].Row)))
 		fmt.Println(Grey("       Col: ") + Blue(strconv.Itoa(logs[i].Col)))
 		fmt.Println(Grey("  Conflict: "))
+
 		lines := logs[i].Conflict
-		fmt.Println("            " + lines[0])
-		fmt.Println(Red("            " + lines[1]))
-		fmt.Println("            " + lines[2])
+		for _, line := range lines {
+			fmt.Println("            " + line)
+		}
 	}
 }
 
