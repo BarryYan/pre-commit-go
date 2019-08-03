@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-const GIT_STATUS_CMD = "git status -s | awk '{print $2}'"
+const GIT_STATUS_CMD string = "git status -s | awk '{print $2}'"
 const CONFLICT_SIGNAL string = "<<<<<<"
 
 // Log for record conflict info
@@ -115,7 +115,7 @@ func PrintLog(logs []Log) {
 		fmt.Println(RedFlash("Error:"))
 		fmt.Println(Grey("      File: ") + Blue(logs[i].Filename))
 		fmt.Println(Grey("      Line: ") + Blue(strconv.Itoa(logs[i].Row)))
-		fmt.Println(Grey("       Col: ") + Blue(strconv.Itoa(logs[i].Col)))
+		fmt.Println(Grey("    Column: ") + Blue(strconv.Itoa(logs[i].Col)))
 		fmt.Println(Grey("  Conflict: "))
 
 		lines := logs[i].Conflict
